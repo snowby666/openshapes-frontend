@@ -41,21 +41,20 @@ const Dashboard = () => {
   // Handle bot actions (start, stop, restart)
   const handleBotAction = async (botId: string, action: 'start' | 'stop' | 'restart') => {
     try {
-      let response
       if (action === 'start') {
-        response = await botService.startBot(botId)
+        await botService.startBot(botId)
       } else if (action === 'stop') {
-        response = await botService.stopBot(botId)
+        await botService.stopBot(botId)
       } else if (action === 'restart') {
-        response = await botService.restartBot(botId)
+        await botService.restartBot(botId)
       }
 
       // Refresh bot list
       const updatedBots = await botService.getUserBots()
       setBots(updatedBots)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(`Error ${action} bot:`, err)
-      setError(`Failed to ${action} bot: ${err.message}`)
+      setError(`Failed to ${action} bot: ${err instanceof Error ? err.message : 'Unknown error'}`)
     }
   }
 
@@ -66,9 +65,9 @@ const Dashboard = () => {
         await botService.deleteBot(botId)
         // Remove the deleted bot from the list
         setBots(bots.filter(bot => bot.id !== botId))
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error deleting bot:', err)
-        setError(`Failed to delete bot: ${err.message}`)
+        setError(`Failed to delete bot: ${err instanceof Error ? err.message : 'Unknown error'}`)
       }
     }
   }
@@ -109,7 +108,7 @@ const Dashboard = () => {
         {/* Bot list */}
         {bots.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-xl mb-4">You don't have any bots yet.</p>
+            <p className="text-xl mb-4">You don&apos;t have any bots yet.</p>
             <Link 
               href="/bots/create" 
               className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition"

@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useAuth } from '@/context/AuthContext'
-import Image from 'next/image'
+// import Image from 'next/image' - Uncomment when needed
 import Link from 'next/link'
 
 export default function Home() {
@@ -107,7 +107,7 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">Customization</h3>
-              <p className="text-gray-300">Tailor every detail of your AI character's behavior and responses.</p>
+              <p className="text-gray-300">Tailor every detail of your AI character&apos;s behavior and responses.</p>
             </div>
             <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
               <div className="bg-indigo-600 rounded-full w-12 h-12 flex items-center justify-center mb-4">

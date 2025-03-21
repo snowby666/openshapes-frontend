@@ -72,7 +72,9 @@ const CreateBot = () => {
       let configData: Record<string, unknown>
       try {
         configData = JSON.parse(configText)
-      } catch (_) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        // Use specific error message but don't need the error variable itself
         setError('Invalid JSON in config file')
         setSubmitting(false)
         return
@@ -84,7 +86,9 @@ const CreateBot = () => {
         const brainText = await brainFile.text()
         try {
           brainData = JSON.parse(brainText)
-        } catch (_) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err) {
+          // Use specific error message but don't need the error variable itself
           setError('Invalid JSON in brain file')
           setSubmitting(false)
           return
@@ -149,7 +153,7 @@ const CreateBot = () => {
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Bot Name *
+                Bot Name required
               </label>
               <input
                 type="text"
@@ -176,7 +180,7 @@ const CreateBot = () => {
             
             <div className="mb-4">
               <label htmlFor="botToken" className="block text-sm font-medium text-gray-700 mb-1">
-                Discord Bot Token *
+                Discord Bot Token required
               </label>
               <input
                 type="password"
@@ -202,7 +206,7 @@ const CreateBot = () => {
             
             <div className="mb-4">
               <label htmlFor="configFile" className="block text-sm font-medium text-gray-700 mb-1">
-                Configuration File (config.json) *
+                Configuration File (config.json) required
               </label>
               <input
                 type="file"
