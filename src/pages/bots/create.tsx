@@ -69,10 +69,10 @@ const CreateBot = () => {
     try {
       // Read config file
       const configText = await configFile.text()
-      let configData
+      let configData: Record<string, unknown>
       try {
         configData = JSON.parse(configText)
-      } catch (err) {
+      } catch (_) {
         setError('Invalid JSON in config file')
         setSubmitting(false)
         return
@@ -84,7 +84,7 @@ const CreateBot = () => {
         const brainText = await brainFile.text()
         try {
           brainData = JSON.parse(brainText)
-        } catch (err) {
+        } catch (_) {
           setError('Invalid JSON in brain file')
           setSubmitting(false)
           return
@@ -105,9 +105,10 @@ const CreateBot = () => {
       
       // Redirect to bot management page
       router.push(`/bots/${result.id}?created=true`)
-    } catch (err: any) {
-      console.error('Error creating bot:', err)
-      setError(err.message || 'Failed to create bot')
+    } catch (error) {
+      console.error('Error creating bot:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create bot'
+      setError(errorMessage)
     } finally {
       setSubmitting(false)
     }

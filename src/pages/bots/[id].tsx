@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 // Tab interface
 type TabType = 'overview' | 'settings' | 'logs' | 'api'
+type ErrorType = string | Error | unknown;
 
 const BotDetailPage = () => {
   const router = useRouter()
@@ -51,9 +52,9 @@ const BotDetailPage = () => {
           setTtsModel(botData.config.api_settings.tts_model || '')
           setTtsVoice(botData.config.api_settings.tts_voice || '')
         }
-      } catch (err: any) {
-        console.error('Error fetching bot:', err)
-        setError(err.message || 'Failed to load bot data')
+      } catch (error) {
+        console.error('Error fetching bot:', error)
+        setError(getErrorMessage(error))
       } finally {
         setBotLoading(false)
       }
@@ -65,6 +66,17 @@ const BotDetailPage = () => {
       router.push('/')
     }
   }, [id, user, loading, router])
+  
+  // Helper function to extract error message
+  const getErrorMessage = (error: ErrorType): string => {
+    if (error instanceof Error) {
+      return error.message
+    }
+    if (typeof error === 'string') {
+      return error
+    }
+    return 'An unknown error occurred'
+  }
   
   // Check for creation success message
   useEffect(() => {
@@ -80,13 +92,12 @@ const BotDetailPage = () => {
     try {
       setError(null)
       
-      let response
       if (action === 'start') {
-        response = await botService.startBot(bot.id)
+        await botService.startBot(bot.id)
       } else if (action === 'stop') {
-        response = await botService.stopBot(bot.id)
+        await botService.stopBot(bot.id)
       } else if (action === 'restart') {
-        response = await botService.restartBot(bot.id)
+        await botService.restartBot(bot.id)
       }
       
       setSuccessMessage(`Bot ${action}ed successfully`)
@@ -94,9 +105,9 @@ const BotDetailPage = () => {
       // Refresh bot data after action
       const updatedBot = await botService.getBot(bot.id)
       setBot(updatedBot)
-    } catch (err: any) {
-      console.error(`Error ${action}ing bot:`, err)
-      setError(err.message || `Failed to ${action} bot`)
+    } catch (error) {
+      console.error(`Error ${action}ing bot:`, error)
+      setError(getErrorMessage(error))
     }
   }
   
@@ -108,9 +119,9 @@ const BotDetailPage = () => {
       try {
         await botService.deleteBot(bot.id)
         router.push('/dashboard?deleted=true')
-      } catch (err: any) {
-        console.error('Error deleting bot:', err)
-        setError(err.message || 'Failed to delete bot')
+      } catch (error) {
+        console.error('Error deleting bot:', error)
+        setError(getErrorMessage(error))
       }
     }
   }
@@ -123,9 +134,9 @@ const BotDetailPage = () => {
     try {
       const response = await botService.getBotLogs(bot.id, 100) // Get last 100 lines
       setLogs(response.logs)
-    } catch (err: any) {
-      console.error('Error fetching logs:', err)
-      setError(err.message || 'Failed to fetch logs')
+    } catch (error) {
+      console.error('Error fetching logs:', error)
+      setError(getErrorMessage(error))
     } finally {
       setLogsLoading(false)
     }
@@ -154,9 +165,9 @@ const BotDetailPage = () => {
       // Refresh bot data
       const updatedBot = await botService.getBot(bot.id)
       setBot(updatedBot)
-    } catch (err: any) {
-      console.error('Error updating API settings:', err)
-      setError(err.message || 'Failed to update API settings')
+    } catch (error) {
+      console.error('Error updating API settings:', error)
+      setError(getErrorMessage(error))
     } finally {
       setSubmittingApi(false)
     }
@@ -178,7 +189,7 @@ const BotDetailPage = () => {
               </Link>
               <h1 className="text-3xl font-bold">Bot Not Found</h1>
             </div>
-            <p>The bot you're looking for doesn't exist or you don't have access to it.</p>
+            <p>The bot you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.</p>
           </div>
         </div>
       </div>
@@ -478,13 +489,13 @@ const BotDetailPage = () => {
               <div>
                 <h2 className="text-2xl font-semibold mb-4">Advanced Settings</h2>
                 <p className="mb-6 text-gray-600">
-                  Advanced settings are currently not available through the web interface. To modify advanced configuration, you need to update the config.json file directly.
+                  Advanced settings are currently not available through the web interface. To modify advanced configuration, you&apos;ll need to update the config.json file directly.
                 </p>
                 
                 <div className="bg-yellow-50 p-4 rounded mb-6">
                   <h3 className="font-semibold text-yellow-800 mb-2">Warning</h3>
                   <p className="text-yellow-700">
-                    Modifying advanced settings may affect your bot's behavior or cause it to stop working. Proceed with caution.
+                    Modifying advanced settings may affect your bot&apos;s behavior or cause it to stop working. Proceed with caution.
                   </p>
                 </div>
                 

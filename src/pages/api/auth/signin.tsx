@@ -1,7 +1,6 @@
+// Types for props
 import { GetServerSideProps } from 'next'
 import { getProviders, signIn, getCsrfToken } from 'next-auth/react'
-import Image from 'next/image'
-import Link from 'next/link'
 
 // Types for props
 interface SignInProps {
@@ -12,10 +11,9 @@ interface SignInProps {
     signinUrl: string
     callbackUrl: string
   }>
-  csrfToken: string
 }
 
-export default function SignIn({ providers, csrfToken }: SignInProps) {
+export default function SignIn({ providers }: SignInProps) {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-gray-900 to-gray-800 px-4">
       <div className="mb-8 text-center">
@@ -74,12 +72,12 @@ export default function SignIn({ providers, csrfToken }: SignInProps) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const providers = await getProviders()
-  const csrfToken = await getCsrfToken(context)
+  // We request csrfToken but don't pass it to the component since it's not needed
+  await getCsrfToken(context)
   
   return {
     props: {
-      providers: providers || {},
-      csrfToken: csrfToken || ''
+      providers: providers || {}
     },
   }
 }

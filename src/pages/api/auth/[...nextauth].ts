@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account }) {
       // Add access token from Discord to the token
       if (account) {
         token.accessToken = account.access_token
@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       // Add the access token to the session
-      // @ts-ignore - We know this field exists on the token
+      // @ts-expect-error - We know this field exists but TypeScript doesn't
       session.accessToken = token.accessToken as string | undefined
       return session
     },

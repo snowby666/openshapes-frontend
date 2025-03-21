@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from 'react-query'
-import { botService, BotCreate, Bot, BotUpdate, APISettings } from '@/services/api'
+import { botService, BotCreate, BotUpdate, APISettings } from '@/services/api'
 import { toast } from 'react-hot-toast'
 
 export const useBots = () => {
@@ -13,20 +12,10 @@ export const useBots = () => {
     error: botsError,
     refetch: refetchBots
   } = useQuery('bots', botService.getUserBots, {
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to load bots')
+    onError: (error) => {
+      toast.error(error?.message || 'Failed to load bots')
     }
   })
-  
-  // Get a single bot
-  const getBot = (botId: string) => {
-    return useQuery(['bot', botId], () => botService.getBot(botId), {
-      enabled: !!botId,
-      onError: (error: any) => {
-        toast.error(error.message || 'Failed to load bot')
-      }
-    })
-  }
   
   // Create a bot
   const createBotMutation = useMutation(
@@ -36,8 +25,8 @@ export const useBots = () => {
         queryClient.invalidateQueries('bots')
         toast.success('Bot created successfully')
       },
-      onError: (error: any) => {
-        toast.error(error.message || 'Failed to create bot')
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to create bot')
       }
     }
   )
@@ -52,8 +41,8 @@ export const useBots = () => {
         queryClient.invalidateQueries('bots')
         toast.success('Bot updated successfully')
       },
-      onError: (error: any) => {
-        toast.error(error.message || 'Failed to update bot')
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to update bot')
       }
     }
   )
@@ -66,8 +55,8 @@ export const useBots = () => {
         queryClient.invalidateQueries('bots')
         toast.success('Bot deleted successfully')
       },
-      onError: (error: any) => {
-        toast.error(error.message || 'Failed to delete bot')
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to delete bot')
       }
     }
   )
@@ -81,8 +70,8 @@ export const useBots = () => {
         queryClient.invalidateQueries('bots')
         toast.success('Bot started successfully')
       },
-      onError: (error: any) => {
-        toast.error(error.message || 'Failed to start bot')
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to start bot')
       }
     }
   )
@@ -96,8 +85,8 @@ export const useBots = () => {
         queryClient.invalidateQueries('bots')
         toast.success('Bot stopped successfully')
       },
-      onError: (error: any) => {
-        toast.error(error.message || 'Failed to stop bot')
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to stop bot')
       }
     }
   )
@@ -111,26 +100,11 @@ export const useBots = () => {
         queryClient.invalidateQueries('bots')
         toast.success('Bot restarted successfully')
       },
-      onError: (error: any) => {
-        toast.error(error.message || 'Failed to restart bot')
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to restart bot')
       }
     }
   )
-  
-  // Get bot logs
-  const getBotLogs = (botId: string, lines: number = 50) => {
-    return useQuery(
-      ['bot-logs', botId, lines],
-      () => botService.getBotLogs(botId, lines),
-      {
-        enabled: !!botId,
-        refetchInterval: false,
-        onError: (error: any) => {
-          toast.error(error.message || 'Failed to load bot logs')
-        }
-      }
-    )
-  }
   
   // Update API settings
   const updateAPISettingsMutation = useMutation(
@@ -141,18 +115,20 @@ export const useBots = () => {
         queryClient.invalidateQueries(['bot', variables.botId])
         toast.success('API settings updated successfully')
       },
-      onError: (error: any) => {
-        toast.error(error.message || 'Failed to update API settings')
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to update API settings')
       }
     }
   )
+  
+  // These custom hooks for individual bot retrieval and logs need to be separate
+  // since we can't call hooks conditionally or inside regular functions
   
   return {
     bots,
     botsLoading,
     botsError,
     refetchBots,
-    getBot,
     createBot: createBotMutation.mutate,
     isCreatingBot: createBotMutation.isLoading,
     updateBot: updateBotMutation.mutate,
@@ -165,8 +141,35 @@ export const useBots = () => {
     isStoppingBot: stopBotMutation.isLoading,
     restartBot: restartBotMutation.mutate,
     isRestartingBot: restartBotMutation.isLoading,
-    getBotLogs,
     updateAPISettings: updateAPISettingsMutation.mutate,
     isUpdatingAPISettings: updateAPISettingsMutation.isLoading
   }
+}
+
+// Separate hooks for individual bot data and logs to avoid Rules of Hooks violations
+export const useBot = (botId: string | undefined) => {
+  return useQuery(
+    ['bot', botId],
+    () => botId ? botService.getBot(botId) : null,
+    {
+      enabled: !!botId,
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to load bot')
+      }
+    }
+  )
+}
+
+export const useBotLogs = (botId: string | undefined, lines: number = 50) => {
+  return useQuery(
+    ['bot-logs', botId, lines],
+    () => botId ? botService.getBotLogs(botId, lines) : null,
+    {
+      enabled: !!botId,
+      refetchInterval: false,
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to load bot logs')
+      }
+    }
+  )
 }

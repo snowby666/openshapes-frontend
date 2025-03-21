@@ -27,21 +27,21 @@ export interface Bot {
   status: string
   container_id?: string
   created_at: string
-  config?: any
+  config?: Record<string, unknown>
 }
 
 export interface BotCreate {
   name: string
   description?: string
   bot_token: string
-  config: any
-  brain_data?: any
+  config: Record<string, unknown>
+  brain_data?: Record<string, unknown>
 }
 
 export interface BotUpdate {
   name?: string
   description?: string
-  config?: any
+  config?: Record<string, unknown>
 }
 
 export interface APISettings {
@@ -109,7 +109,7 @@ export const botService = {
   },
 
   // Get bot stats
-  async getBotStats(botId: string): Promise<{ stats: any }> {
+  async getBotStats(botId: string): Promise<{ stats: Record<string, unknown> }> {
     const response = await apiClient.get(`/api/bots/${botId}/stats`)
     return response.data
   },
@@ -204,4 +204,6 @@ export const adminService = {
   },
 }
 
-export default { botService, userService, adminService }
+// Named export for services
+const services = { botService, userService, adminService }
+export default services
